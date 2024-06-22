@@ -18,8 +18,10 @@ async function handleShortId(req, res) {
 
     // return res.json({ id: shortId });
     
-    const allUrls = await URL.find({}); // Fetch all URLs to include in the response
-    return res.render("home", { id: shortId, urls: allUrls });
+    // const allUrls = await URL.find({}); // Fetch all URLs to include in the response
+    // return res.render("home", { id: shortId, urls: allUrls });
+
+    res.redirect(`/?id=${shortId}`);
 }
 
 
@@ -62,8 +64,8 @@ async function handleGetAnalytics(req, res) {
 
 async function handleAllUsersURL(req,res){
     const allurls = await URL.find({});
-    console.log(allurls)
-    return res.render("home",{ id:null, urls: allurls  });     // SSR on file("home", u can give data here to render out of file)
+    const id = req.query.id || null;
+    return res.render("home",{ id, urls: allurls  });     // SSR on file("home", u can give data here to render out of file)
                                                               //                        ^---data send from here(from backend) will save in "locals"(which we can extract in ejs file)
 }
 
