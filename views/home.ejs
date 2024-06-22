@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL_SHORTENER</title>
+</head>
+ <body>   <!-- to come to this ejs we need to do res.render("home",data which will store in locals) -->
+     
+
+    <h1><strong>URL SHORTENER</strong></h1> 
+
+         <% if (id) { %>
+              <p>URL Generated: http://localhost:8000/<%= id %></p>
+         <% } %>
+         
+         <div>
+             <form method="POST" action="/url">
+                 <label><strong>Enter Your Original URL:</strong></label>
+                 <input type="text" name="url" placeholder="https://example.com" required>
+                 <button type="submit">Generate</button>
+             </form>
+         </div>
+
+    <h2>All History</h2>
+
+         <div>
+            <% if (urls && urls.length > 0) { %>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Serial no</th>
+                            <th>ShortID</th>
+                            <th>RedirectUrl</th>
+                            <th>TotalClicks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% urls.forEach((url, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><%= url.shortId %></td>
+                                <td><%= url.redirectUrl %></td>
+                                <td><%= url.visitHistory.length %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p>No URLs found</p>
+            <% } %>
+             
+         </div>
+     
+        
+
+</body>
+</html>
