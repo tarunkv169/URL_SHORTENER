@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { handleShortId, handleGetAnalytics,handleRedirectToUrl} = require("../controller/url");
+const { handleShortId, handleGetAnalytics} = require("../controller/url");
 
 
-
-   router.post('/url', handleShortId);
-   router.get('/:shortId', handleRedirectToUrl);
-   router.get('/analytics/:shortId', handleGetAnalytics);
+// Route to handle form submission and URL generation
+   router.post('/', handleShortId);
+   router.get('/url/analytics/:shortId', handleGetAnalytics);
    
    
 
