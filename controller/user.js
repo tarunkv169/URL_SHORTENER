@@ -1,6 +1,6 @@
 const User = require('../models/user'); // Ensure the correct path
 const {v4: uuidv4} = require("uuid")
-const {SetUser,GetUser} = require("../service/auth");
+const {SetUser,GetUser} = require("../service_for_token/auth");
 
 
      async function handleSignUp(req, res) 
@@ -45,16 +45,21 @@ const {SetUser,GetUser} = require("../service/auth");
         }
 
 
+                       //🛑STATEFULL🛑
+        // // creating id and mapping it with particular user
+        // const sessionid = uuidv4();
 
-        // creating id and mapping it with particular user
-        const sessionid = uuidv4();
+        // //understand it with example of car parking
+        // // require the auth of service folder ^  -----i.e reach the cabin
+        // SetUser(sessionid,LogInUser);         // in this we registor our id
+        // res.cookie("uid",sessionid);          // we put our id in cookie bucket
 
-        //understand it with example of car parking
-        // require the auth of service folder ^  -----i.e reach the cabin
-        SetUser(sessionid,LogInUser);         // in this we registor our id
-        res.cookie("uid",sessionid);          // we put our id in cookie bucket
-       
-        return res.redirect("/")  // redirect update the url and render update the webpage to ejs file
+
+                        //🛑STATELESS🛑
+        const token = SetUser(LogInUser);
+        res.cookie("token",token);
+        console.log("hellow")
+        return res.render("home")  // redirect update the url and render update the webpage to ejs file
 
      }
 
