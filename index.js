@@ -1,10 +1,24 @@
 const express = require("express");
+  const {connectMongodb} = require('./connection');
+  const urlRouter = require("./routes/url");
+//   const {restrictToLoggedInUserOnly,checkAuth} = require("./middleware/auth");
+  const {checkforAuthentication,restrictToRoles} = require("./middleware/auth");
+  const cookieParser = require("cookie-parser");
+  const URL = require('./models/url');
+  const ejs = require('ejs');
+  const path = require('path');
+  const staticRouter = require("./routes/staticRoute");
+  const userRouter = require("./routes/user");
+
+
+
 const app = express();
 const port = 8000;
 
 
-  // mongodb connection
-  const {connectMongodb} = require('./connection');
+
+  //  MONGODB CONNECTION
+
   connectMongodb("mongodb://127.0.0.1:27017/shortened_url")
   .then(()=>console.log({msg:"mongodb connected"}))
   .catch((err)=>console.log({msg:err}))
@@ -13,26 +27,23 @@ const port = 8000;
 
 
 
-  // middleware
+  //  MIDDLEWARE
+
   app.use(express.json());                        //middleware to parse the json data
   app.use(express.urlencoded({extended:false}));   //middleware to parse the form data
-  //middleware to parse the cookie
-  const cookieParser = require("cookie-parser");
-  app.use(cookieParser())                          
+  app.use(cookieParser())                          //middleware to parse the cookie
+  app.use(checkforAuthentication)                //middleware to check auth before login                         
 
 
 
-
-  //urlRouter--routes to url
-  const urlRouter = require("./routes/url");
-  const {restrictToLoggedInUserOnly,checkAuth} = require("./middleware/auth");
-  app.use('/url',restrictToLoggedInUserOnly,urlRouter);
-
-
+  //   ROUTER'S
+                                   // 🛑\/--this is our "server roles array"__with which we match our "requested user role"
+  app.use('/url',restrictToRoles(["NORMAL","ADMIN"]),urlRouter);  //urlRouter--routes to url  
+  app.use("/",staticRouter);                  //Static_routes---rendering is here
+  app.use("/user",userRouter);                //userRouter--routes to user
 
 
-  //RedirectUrl--with shortid it directs to webpage
-  const URL = require('./models/url');
+  //   REDIRECT_URL--with shortid it directs to webpage
   app.get('/url/:shortId',async (req, res)=>
                           {
                                const shortId = req.params.shortId;
@@ -55,27 +66,11 @@ const port = 8000;
 
 
 
-  //ejs---SERVER SIDE RENDERING--(PUG,HANDLEOVER)
-  const ejs = require('ejs');
-  const path = require('path');
+  //    ejs---SERVER SIDE RENDERING--(PUG,HANDLEOVER)
+  
   app.set("view engine","ejs");             // tell application jo "engine" hamari website the view dikhayega wo "ejs" hoga  //ejs render our whole website on server and then show final output on frontend 
   app.set("views",path.resolve("./views"))  // tell path of ejs file
 
 
-
-
-  //Static_routes---rendering is here
-  const staticRouter = require("./routes/staticRoute");
-  app.use("/",checkAuth,staticRouter);
-
-
-
-  //userRouter--routes to user
-  const userRouter = require("./routes/user");
-  app.use("/user",userRouter);
-
-  
-
-  
 
 app.listen(port,()=>console.log(`server is listened at http://localhost:${port}`));
